@@ -22,9 +22,7 @@ def hamilton_matrix(interval, N, b, pit_height, pit_width, m, hbar, barrier_heig
             if i == j - 1:
                 matrix[i][j] = (-hbar ** 2) / (2 * m * b ** 2) * 7.67
             elif i == j:
-                matrix[i][j] = ((hbar ** 2) / (m * b ** 2) * 7.67 + pit_potential_function(i * b + interval[0],
-                                                                                           pit_height, pit_width,
-                                                                                           barrier_height, barrier_width))
+                matrix[i][j] = ((hbar ** 2) / (m * b ** 2) * 7.67 + pit_potential_function(i * b + interval[0], pit_height, pit_width, barrier_height, barrier_width))
             elif i == j + 1:
                 matrix[i][j] = (-hbar ** 2) / (2 * m * b ** 2) * 7.67
     return matrix
@@ -44,10 +42,10 @@ def pit_energy_levels(eigenvalues, pit_height):
 
 def energy_levels_find(interval, number_of_points, b, pit_height, pit_width, m, hbar, barrier_height, barrier_width):
     matrix = hamilton_matrix(interval, number_of_points, b, pit_height, pit_width, m, hbar, barrier_height, barrier_width)
-    ###############################
+    
     eigenvalues_matrix, values_matrix = eigenvalues(matrix)
     values_matrix = np.transpose(values_matrix)
-    ###############################
+    
     pit_energy, stop_index = pit_energy_levels(eigenvalues_matrix, pit_height)
     values_matrix = values_matrix[:stop_index]
     return pit_energy, values_matrix
@@ -108,7 +106,7 @@ def delete_graph_lines(element, graph):
 
 def draw_energy_levels(graph, levels_energy, pit_height, figures_id):
     energy_levels = [-200 + levels_energy[index] / pit_height * 200 for index in range(levels_energy.shape[0])]
-    figures_id['energy_levels'] = [graph.DrawLine((-100, energy_levels[index]), (100, energy_levels[index]),
+    figures_id['energy_levels'] = [graph.DrawLine((-100, energy_levels[index]), (100, energy_levels[index]), 
                                                   color='blue', width=2) for index in range(len(energy_levels))]
     return energy_levels
 
@@ -146,8 +144,7 @@ def redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_level
     if values['-CHOOSEDLEVEL-']:
         draw_levels = list(map(lambda x: int(x) - 1, values['-CHOOSEDLEVEL-']))
         for level in draw_levels:
-            draw_function(values['-MODE-'], level, graph, figures_id, x_axis, eigenvectors,
-                          coord_levels[level], pit_width, scaling_factor, colors[level])
+            draw_function(values['-MODE-'], level, graph, figures_id, x_axis, eigenvectors, coord_levels[level], pit_width, scaling_factor, colors[level])
 
 
 def check_parameters(window, values, change_configuration_elements):
@@ -217,12 +214,12 @@ def interface():
                           [sg.Checkbox('Show splitting', default=False, key='-SPLITTING-', enable_events=True)],
                           [sg.Button('Save graph', border_width=3, enable_events=True, key='-SAVEGRAPH-')],
                           [sg.Text('Energy levels values: ', key='-ENERGYVALUES-')]], vertical_alignment='top')]]
-    ###############################
+    
     sg.set_options(dpi_awareness=True)
     window = sg.Window('Numerical solution of the Schrödinger equation', layout, element_justification='left',
                        finalize=True, font=('Times New Roman', 12))
     graph = window['-GRAPH-']
-    ###############################
+    
     graph.DrawLine((-200, -200), (220, -200), width=2)
     graph.DrawLine((0, -200), (0, 220), width=2)
 
@@ -238,7 +235,7 @@ def interface():
 
     figures_id = dict()
     colors = {}
-    ###############################
+    
     number_of_points = 1000  # parameter
     pit_height, pit_width, m, hbar, barrier_height, barrier_width = 10, 5, 1, 1, 0, 0  # parameters
     pit_width, barrier_width = pit_width / 2, barrier_width / 2
@@ -246,23 +243,20 @@ def interface():
     L = interval[1] - interval[0]
     b = L / (number_of_points + 1)
     x_axis = np.linspace(interval[0], interval[1], number_of_points)
-    ###############################
-    pit_energy, eigenvectors = energy_levels_find(interval, number_of_points, b, pit_height, pit_width, m, hbar,
-                                                  barrier_height, barrier_width)
+    
+    pit_energy, eigenvectors = energy_levels_find(interval, number_of_points, b, pit_height, pit_width, m, hbar, barrier_height, barrier_width)
     coord_levels = []
-    ###############################
+    
     window['-LEVELSNUM-'].update('Number of energy levels = ' + str(len(pit_energy)))
-    ###############################
+    
     change_configuration_events = ['-PITHEIGHT-', '-PITWIDTH-', '-MASS-', '-BARRIERHEIGHT-', '-BARRIERWIDTH-']
-    ###############################
+    
     draw_x_axis(graph, pit_width, figures_id)
     draw_y_axis(graph, pit_height, figures_id)
     draw_border(graph, figures_id=figures_id)
     coord_levels = draw_energy_levels(graph, pit_energy, pit_height, figures_id)
     figures_id['wavefunction'] = []
-    figures_id['wavefunction'].append(graph.draw_lines(wavefunction_array(x_axis * 100 / pit_width,
-                                                                          eigenvectors[0] * 500 + coord_levels[0]),
-                                                  color='green', width=3))
+    figures_id['wavefunction'].append(graph.draw_lines(wavefunction_array(x_axis * 100 / pit_width, eigenvectors[0] * 500 + coord_levels[0]), color='green', width=3))
     print_energies(window, pit_energy)
     colors = {index: 'Green' for index in range(len(pit_energy))}
     window['-SCALING-'].update('500')
@@ -270,7 +264,7 @@ def interface():
     window['-CHOOSEDLEVEL-'].update(values=list(range(1, len(coord_levels) + 1)), set_to_index=[0])
     window['-FUNCCOLOR-'].update(values=list(range(1, len(coord_levels) + 1)), set_to_index=[0])
     draw_levels = []
-    ###############################
+    
     while True:
         event, values = window.read(timeout=20)
         if event == sg.WINDOW_CLOSED:
@@ -287,8 +281,7 @@ def interface():
                 L = interval[1] - interval[0]
                 b = L / (number_of_points + 1)
                 x_axis = np.linspace(interval[0], interval[1], number_of_points)
-                pit_energy, eigenvectors = energy_levels_find(interval, number_of_points, b, pit_height, pit_width,
-                                                              m, hbar, barrier_height, barrier_width)
+                pit_energy, eigenvectors = energy_levels_find(interval, number_of_points, b, pit_height, pit_width, m, hbar, barrier_height, barrier_width)
                 window['-LEVELSNUM-'].update('Number of energy levels = ' + str(len(pit_energy)))
                 delete_graph_lines(figures_id.get('x_axis', 0), graph)
                 delete_graph_lines(figures_id.get('x_axis_txt', 0), graph)
@@ -305,8 +298,7 @@ def interface():
                 if pit_energy.shape[0]:
                     coord_levels = draw_energy_levels(graph, pit_energy, pit_height, figures_id)
                     colors = {index: 'Green' for index in range(len(pit_energy))}
-                    draw_function(values['-MODE-'], 0, graph, figures_id, x_axis, eigenvectors, coord_levels[0],
-                                  pit_width, scaling_factor, colors[0])
+                    draw_function(values['-MODE-'], 0, graph, figures_id, x_axis, eigenvectors, coord_levels[0], pit_width, scaling_factor, colors[0])
                     print_energies(window, pit_energy)
                     window['-CHOOSEDLEVEL-'].update(values=list(range(1, len(coord_levels) + 1)), set_to_index=[0])
                     window['-FUNCCOLOR-'].update(values=list(range(1, len(coord_levels) + 1)), set_to_index=[0])
@@ -325,18 +317,15 @@ def interface():
                 if pit_energy.shape[0]:
                     coord_levels = draw_energy_levels(graph, pit_energy, pit_height, figures_id)
                     for level in draw_levels:
-                        draw_function(values['-MODE-'], level, graph, figures_id, x_axis, eigenvectors,
-                                      coord_levels[level], pit_width, scaling_factor, colors[level])
+                        draw_function(values['-MODE-'], level, graph, figures_id, x_axis, eigenvectors, coord_levels[level], pit_width, scaling_factor, colors[level])
         if event == '-MODE-':
-            redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_levels, pit_width, scaling_factor,
-                            colors)
+            redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_levels, pit_width, scaling_factor, colors)
         if event == '-OKSCALE-':
             try:
                 scaling_factor = float(values['-SCALING-'])
                 if scaling_factor > 0:
                     window['-SCALING-'].update(background_color='White')
-                    redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_levels, pit_width,
-                                    scaling_factor, colors)
+                    redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_levels, pit_width,scaling_factor, colors)
                 else:
                     window['-SCALING-'].update(background_color='Yellow')
             except ValueError:
@@ -347,11 +336,9 @@ def interface():
             if values['-COLORVALUE-'] != 'None':
                 colors[int(values['-FUNCCOLOR-']) - 1] = values['-COLORVALUE-']
                 window['-COLOR-'].update(button_color=colors[int(values['-FUNCCOLOR-']) - 1])
-                redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_levels, pit_width,
-                                scaling_factor, colors)
+                redraw_function(figures_id, graph, values, x_axis, eigenvectors, coord_levels, pit_width, scaling_factor, colors)
         if event == '-SAVEGRAPH-':
-            filename = sg.popup_get_file('Save graph', title='Save', save_as=True, file_types=(('PNG', '*.png'),),
-                                         no_window=True)
+            filename = sg.popup_get_file('Save graph', title='Save', save_as=True, file_types=(('PNG', '*.png'),), no_window=True)
             if filename:
                 save_element_as_file(graph, filename)
         if event == '-SPLITTING-':
